@@ -33,6 +33,8 @@ public class EmployeeController {
         LambdaQueryWrapper<Employee> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(Employee::getUsername,employee.getUsername());
         Employee emp = employeeService.getOne(queryWrapper);
+        System.out.println(emp);
+
 
         //判断
         if(emp == null){
