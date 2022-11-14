@@ -25,6 +25,8 @@ public class EmployeeController {
 
     @PostMapping("/login")
     public Context<Employee> login(HttpServletRequest request, @RequestBody Employee employee){
+        System.out.println(employee);
+
         //对密码进行MD5处理
         String password=employee.getPassword();
         password=DigestUtils.md5DigestAsHex(password.getBytes());
