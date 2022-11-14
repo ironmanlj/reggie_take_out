@@ -106,4 +106,8 @@ public class EmployeeController {
         return Context.success("员工信息修改成功");
     }
 
+    @PostMapping
+    public Context<String> test(){
+        return Context.success("test");
+    }
 }
