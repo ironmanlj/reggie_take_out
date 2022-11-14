@@ -106,8 +106,15 @@ public class EmployeeController {
         return Context.success("员工信息修改成功");
     }
 
-    @PostMapping
-    public Context<String> test(){
-        return Context.success("test");
+
+    //根据id查询信息
+    @GetMapping("/{id}")
+    public Context<Employee> getById(@PathVariable Long id){
+        log.info("根据id查询信息");
+        Employee employee = employeeService.getById(id);
+        if(employee!=null){
+            return Context.success(employee);
+        }
+        return Context.error("查询不到信息");
     }
 }
