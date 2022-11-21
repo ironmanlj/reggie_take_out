@@ -25,4 +25,11 @@ public class GLobalExceptionHandler {
 
         return Context.error("未知错误");
     }
+
+    @ExceptionHandler(CustomException.class)
+    public Context<String> exceptionHandler(CustomException ex){
+        log.error(ex.getMessage());
+
+        return Context.error(ex.getMessage());
+    }
 }
