@@ -5,10 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.reggie_take_out.common.Context;
 import com.example.reggie_take_out.entity.Category;
+import com.example.reggie_take_out.entity.Dish;
 import com.example.reggie_take_out.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/category")
@@ -29,7 +32,7 @@ public class CategoryController {
         return Context.success("种类已插入");
     }
 
-    @GetMapping("/page")
+    @GetMapping ("/page")
     public Context<Page> page(int page,int pageSize){
         //分页构造器
         Page<Category> pageinfo=new Page<>(page,pageSize);
@@ -45,9 +48,23 @@ public class CategoryController {
     @DeleteMapping
     public Context<String> delete(Long id){
         System.out.println(id);
-        categoryService.remove(id);
 
+        categoryService.remove(id);
         //categoryService.removeById(id);
         return Context.success("删除成功");
+    }
+
+    @GetMapping("/list")
+    public Context<List<Category>> list(Category category){
+        //条件构造器
+        LambdaQueryWrapper<Category> queryWrapper=new LambdaQueryWrapper<>();
+        //添加条件
+        queryWrapper.eq(category.getType()!=null,Category::getType,category.getType());
+        //排序
+        queryWrapper.orderByAsc(Category::getSort).orderByAsc(Category::getUpdateTime);
+        //查询
+        List<Category> list = categoryService.list(queryWrapper);
+
+        return Context.success(list);
     }
 }
