@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Slf4j
 @SpringBootApplication
 @ServletComponentScan
+@EnableTransactionManagement
 public class ReggieTakeOutApplication {
 
     public static void main(String[] args) {

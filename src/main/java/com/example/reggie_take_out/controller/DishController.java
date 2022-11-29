@@ -93,4 +93,30 @@ public class DishController {
 
         return Context.success(dishDto);
     }
+
+
+    @PutMapping
+    public Context<String> update(@RequestBody DishDto dishDto){
+
+        dishService.updateWithFlavor(dishDto);
+
+        return Context.success("更新信息成功");
+    }
+
+
+    @GetMapping("/list")
+    public Context<List<Dish>> list(Dish dish){
+        //构造查询条件
+        LambdaQueryWrapper<Dish> queryWrapper=new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
+
+        queryWrapper.eq(Dish::getStatus,1);
+
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> list = dishService.list(queryWrapper);
+
+        return Context.success(list);
+    }
 }

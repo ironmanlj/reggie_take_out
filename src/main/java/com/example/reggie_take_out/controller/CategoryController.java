@@ -67,4 +67,11 @@ public class CategoryController {
 
         return Context.success(list);
     }
+
+    @PutMapping
+    public Context<String> update(@RequestBody Category category){
+        log.info("修改分类信息");
+        categoryService.updateById(category);
+        return Context.success("修改分类信息成功");
+    }
 }

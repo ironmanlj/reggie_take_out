@@ -24,7 +24,6 @@ import java.util.stream.Stream;
  * @描述
  */
 @Service
-@EnableTransactionManagement
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
 
     @Autowired
@@ -59,10 +58,30 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         BeanUtils.copyProperties(dish,dishDto);
         //查询口味信息
         LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(DishFlavor::getId,dish.getId());
+        queryWrapper.eq(DishFlavor::getDishId,dish.getId());
         List<DishFlavor> flavors = dishFlavorService.list(queryWrapper);
         dishDto.setFlavors(flavors);
         //返回dto对象
         return dishDto;
+    }
+
+    @Override
+    public void updateWithFlavor(DishDto dishDto) {
+        //更新dish表信息
+        this.updateById(dishDto);
+
+        //根据dishid删除相关口味
+        LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(DishFlavor::getDishId,dishDto.getId());
+        dishFlavorService.remove(queryWrapper);
+
+        //将新的口味放进来
+        List<DishFlavor> flavors = dishDto.getFlavors();
+        flavors=flavors.stream().map((item)->{
+            item.setDishId(dishDto.getId());
+            return item;
+        }).collect(Collectors.toList());
+
+        dishFlavorService.saveBatch(flavors);
     }
 }
