@@ -1,6 +1,7 @@
 package com.example.reggie_take_out.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.reggie_take_out.common.Context;
 import com.example.reggie_take_out.dto.DishDto;
@@ -118,5 +119,26 @@ public class DishController {
         List<Dish> list = dishService.list(queryWrapper);
 
         return Context.success(list);
+    }
+
+    //删除菜品
+
+    @DeleteMapping
+    public Context<String> delete(List<Long> ids){
+        return null;
+    }
+
+    @PostMapping("/status/{value}")
+    public Context<String> changeStatus(@PathVariable Integer value,@RequestParam List<Long> ids){
+        //新建查询器
+        UpdateWrapper<Dish> updateWrapper = new UpdateWrapper<>();
+        //根据ids查询
+        updateWrapper.in("id",ids);
+        //修改数据
+        updateWrapper.set("status",value);
+        //封装数据
+        dishService.update(updateWrapper);
+
+        return Context.success("修改售卖状态成功");
     }
 }

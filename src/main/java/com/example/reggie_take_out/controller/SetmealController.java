@@ -1,6 +1,7 @@
 package com.example.reggie_take_out.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.reggie_take_out.common.Context;
 import com.example.reggie_take_out.dto.SetmealDto;
@@ -84,5 +85,20 @@ public class SetmealController {
     public Context<String> delete(@RequestParam List<Long> ids){
         setmealService.removeWithDish(ids);
         return Context.success("删除成功");
+    }
+
+
+    @PostMapping("/status/{value}")
+    public Context<String> changeStatus(@PathVariable Integer value,@RequestParam List<Long> ids){
+        //新建更新器
+        UpdateWrapper<Setmeal> updateWrapper=new UpdateWrapper<>();
+        //根据ids选择更新的项
+        updateWrapper.in("id",ids);
+        //更新状态
+        updateWrapper.set("status",value);
+        //写入数据库
+        setmealService.update(updateWrapper);
+
+        return Context.success("修改套餐状态成功");
     }
 }

@@ -2,6 +2,7 @@ package com.example.reggie_take_out.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.reggie_take_out.common.CustomException;
 import com.example.reggie_take_out.dto.DishDto;
 import com.example.reggie_take_out.entity.Dish;
 import com.example.reggie_take_out.entity.DishFlavor;
@@ -83,5 +84,33 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }).collect(Collectors.toList());
 
         dishFlavorService.saveBatch(flavors);
+    }
+
+    @Override
+    @Transactional
+    public void removeWithFlavor(List<Long> ids) {
+        //判断菜品是否停售，
+        LambdaQueryWrapper<Dish> queryWrapper=new LambdaQueryWrapper<>();
+
+        queryWrapper.in(Dish::getId,ids);
+
+        queryWrapper.eq(Dish::getStatus,1);
+
+        int count = this.count(queryWrapper);
+
+        if (count>0){
+            throw new CustomException("菜品在售");
+        }
+
+
+        //删除菜品信息
+        this.removeByIds(ids);
+
+        //删除对应的口味信息
+        LambdaQueryWrapper<DishFlavor> queryWrapper1=new LambdaQueryWrapper<>();
+
+        queryWrapper1.in(DishFlavor::getDishId,ids);
+
+        dishFlavorService.remove(queryWrapper1);
     }
 }
