@@ -34,6 +34,7 @@ public class AddressBookController {
 
     //设置默认地址
 
+    @PutMapping("/default")
     public Context<AddressBook> setDefault(@RequestBody AddressBook addressBook){
         LambdaUpdateWrapper<AddressBook> updateWrapper=new LambdaUpdateWrapper<>();
         updateWrapper.eq(AddressBook::getUserId,BaseContext.getCurrentId());
@@ -59,7 +60,7 @@ public class AddressBookController {
 
 
     //查询默认地址
-    @GetMapping("default")
+    @PostMapping("default")
     public Context<AddressBook> getDefault(){
         LambdaQueryWrapper<AddressBook> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(AddressBook::getUserId,BaseContext.getCurrentId());
@@ -87,5 +88,19 @@ public class AddressBookController {
         queryWrapper.orderByDesc(AddressBook::getUpdateTime);
 
         return Context.success(addressBookService.list(queryWrapper));
+    }
+
+    //更新地址
+    @PutMapping
+    public Context<String> update(@RequestBody AddressBook addressBook){
+        addressBookService.updateById(addressBook);
+        return Context.success("更新成功");
+    }
+
+    //删除地址
+    @DeleteMapping
+    public Context<String> delete(Long ids){
+        addressBookService.removeById(ids);
+        return Context.success("删除成功");
     }
 }

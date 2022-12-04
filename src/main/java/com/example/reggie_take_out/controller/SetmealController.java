@@ -101,4 +101,18 @@ public class SetmealController {
 
         return Context.success("修改套餐状态成功");
     }
+
+    //展示套餐列表
+    @GetMapping("/list")
+    public Context<List<Setmeal>> list(Setmeal setmeal){
+        LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId());
+
+        queryWrapper.eq(Setmeal::getStatus,1);
+
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+
+        return Context.success(setmealService.list(queryWrapper));
+    }
 }

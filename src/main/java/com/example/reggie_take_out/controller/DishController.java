@@ -7,6 +7,7 @@ import com.example.reggie_take_out.common.Context;
 import com.example.reggie_take_out.dto.DishDto;
 import com.example.reggie_take_out.entity.Category;
 import com.example.reggie_take_out.entity.Dish;
+import com.example.reggie_take_out.entity.DishFlavor;
 import com.example.reggie_take_out.service.CategoryService;
 import com.example.reggie_take_out.service.DishFlavorService;
 import com.example.reggie_take_out.service.DishService;
@@ -105,21 +106,21 @@ public class DishController {
     }
 
 
-    @GetMapping("/list")
-    public Context<List<Dish>> list(Dish dish){
-        //构造查询条件
-        LambdaQueryWrapper<Dish> queryWrapper=new LambdaQueryWrapper<>();
-
-        queryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
-
-        queryWrapper.eq(Dish::getStatus,1);
-
-        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
-
-        List<Dish> list = dishService.list(queryWrapper);
-
-        return Context.success(list);
-    }
+//    @GetMapping("/list")
+//    public Context<List<Dish>> list(Dish dish){
+//        //构造查询条件
+//        LambdaQueryWrapper<Dish> queryWrapper=new LambdaQueryWrapper<>();
+//
+//        queryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
+//
+//        queryWrapper.eq(Dish::getStatus,1);
+//
+//        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+//
+//        List<Dish> list = dishService.list(queryWrapper);
+//
+//        return Context.success(list);
+//    }
 
     //删除菜品
 
@@ -140,5 +141,50 @@ public class DishController {
         dishService.update(updateWrapper);
 
         return Context.success("修改售卖状态成功");
+    }
+
+    @GetMapping("/list")
+    public Context<List<DishDto>> list(Dish dish){
+        //构造查询条件
+        LambdaQueryWrapper<Dish> queryWrapper=new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
+
+        queryWrapper.eq(Dish::getStatus,1);
+
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> list = dishService.list(queryWrapper);
+
+        List<DishDto> dishDtoList=list.stream().map((item)->{
+
+            DishDto dishDto = new DishDto();
+
+            BeanUtils.copyProperties(item,dishDto);
+
+            Long categoryId = item.getCategoryId();
+
+            Category category = categoryService.getById(categoryId);
+
+            if (category!=null){
+                String name = category.getName();
+                dishDto.setCategoryName(name);
+            }
+
+            Long dishId= item.getId();
+
+            LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+            lambdaQueryWrapper.eq(DishFlavor::getDishId,dishId);
+
+            List<DishFlavor> dishFlavors = dishFlavorService.list(lambdaQueryWrapper);
+
+            dishDto.setFlavors(dishFlavors);
+
+            return dishDto;
+
+        }).collect(Collectors.toList());
+
+        return Context.success(dishDtoList);
     }
 }
