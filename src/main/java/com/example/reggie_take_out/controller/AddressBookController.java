@@ -60,7 +60,7 @@ public class AddressBookController {
 
 
     //查询默认地址
-    @PostMapping("default")
+    @GetMapping("/default")
     public Context<AddressBook> getDefault(){
         LambdaQueryWrapper<AddressBook> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(AddressBook::getUserId,BaseContext.getCurrentId());
