@@ -83,4 +83,48 @@ public class ShoppingCartController {
 
         return Context.success("清空成功");
     }
+
+    //对购物车进行菜品删除
+    @PostMapping("/sub")
+    public Context<String> sub(@RequestBody ShoppingCart shoppingCart){
+        LambdaQueryWrapper<ShoppingCart> queryWrapper=new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());
+
+        Long dishId = shoppingCart.getDishId();
+
+        Long setmealId = shoppingCart.getSetmealId();
+
+        if (dishId!=null){
+
+            queryWrapper.eq(ShoppingCart::getDishId,dishId);
+
+            ShoppingCart one = shoppingCartService.getOne(queryWrapper);
+
+            if (one.getNumber()!=1){
+
+                one.setNumber(one.getNumber()-1);
+
+                shoppingCartService.updateById(one);
+
+            }else{
+                shoppingCartService.remove(queryWrapper);
+            }
+        }else {
+
+            queryWrapper.eq(ShoppingCart::getSetmealId,setmealId);
+
+            ShoppingCart one=shoppingCartService.getOne(queryWrapper);
+
+            if (one.getNumber()!=1){
+                one.setNumber(one.getNumber()-1);
+                shoppingCartService.updateById(one);
+            }else {
+                shoppingCartService.remove(queryWrapper);
+            }
+        }
+
+        return Context.success("删除成功" );
+    }
+
 }
